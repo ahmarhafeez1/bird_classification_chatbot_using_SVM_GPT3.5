@@ -1,6 +1,5 @@
-import openai
+from openai import OpenAI
 import os
-import string
 from typing import List 
 
 
@@ -15,19 +14,20 @@ You are a bird expert who is going to answer any question about the following bi
     
     
     api_key = os.getenv("OPENAI_API_KEY")
-    openai.api_key=api_key
-
+    client = OpenAI()
     try:
         messages = [{"role": "system", "content": prompt},
                         {"role": "user", "content": query}
               ]
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=messages
+        completion = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=messages
         )
-        gpt_response = response['choices'][0]['message']['content']
+        gpt_response = completion.choices[0].message.content
 
-        return gpt_response
+        return {
+            "query_response": gpt_response
+            }
         
     except Exception as e:
         print(e)
