@@ -28,17 +28,3 @@ async def query_gpt_route( query: str, bird: str, messages: List[dict[str,str]] 
 
 
 
-    # try:
-    #     # Save the uploaded image temporarily
-        
-    #     gpt_response, messages = await query_gpt(query=query,bird=bird,messages=messages)
-        
-    #     # Return the prediction as JSON
-    #     return JSONResponse(
-    #         content=
-    #         {
-    #             "query_response": gpt_response,
-    #             "messages": messages 
-    #             }, 
-    #         status_code=200)
-

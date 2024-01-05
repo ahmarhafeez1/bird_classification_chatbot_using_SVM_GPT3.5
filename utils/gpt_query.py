@@ -10,7 +10,7 @@ async def query_gpt(
     ):
     
 
-    prompt = f"You are a bird expert. You have the knowledge regarding all the species of bird and today your are going to answer all the question regarding {bird}"
+    prompt = f"You are a bird expert. You have the knowledge regarding all the species of birds and today your are going to answer all the question regarding {bird}"
 
     
     
