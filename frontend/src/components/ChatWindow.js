@@ -5,19 +5,22 @@ const styles = {
     maxHeight: '300px',
     overflowY: 'auto',
     padding: '10px',
-    border: '1px solid #ddd',
-    borderRadius: '4px',
+    border: '1px solid #444',
+    borderRadius: '8px',
+    backgroundColor: '#333',
   },
   message: {
     marginBottom: '10px',
     padding: '8px',
     borderRadius: '4px',
+    color: '#fff',
+    wordBreak: 'break-word',
   },
   userMessage: {
-    background: '#d3e0dc',
+    background: '#2a3941',
   },
   botMessage: {
-    background: '#f0f0f0',
+    background: '#39484f',
   },
 };
 
@@ -32,7 +35,7 @@ const ChatWindow = ({ messages }) => {
             ...(message.role === "user" ? styles.userMessage : styles.botMessage),
           }}
         >
-           { message &&  message.content}
+          {message && message.content}
         </div>
       ))}
     </div>

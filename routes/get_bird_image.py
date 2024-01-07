@@ -16,7 +16,7 @@ async def query_gpt_route(search_term: str):
         return JSONResponse(
                 content=
                 {
-                    "Image Link": image_link, 
+                    "image_link": image_link, 
                 
                 }, status_code=200)
     

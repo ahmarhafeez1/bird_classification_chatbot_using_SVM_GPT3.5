@@ -1,24 +1,44 @@
 import React, { useEffect, useState } from 'react';
 import ChatWindow from '../components/ChatWindow';
 import MessageInput from '../components/MessageInput';
+
+
 import axios from 'axios'
 
 const styles = {
+  body: {
+    backgroundColor: '#111', // Dark background color
+    minHeight: '100vh', // Ensure the body covers the whole viewport height
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   container: {
     maxWidth: '400px',
     margin: 'auto',
     padding: '20px',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
     borderRadius: '8px',
-    backgroundColor: '#fff',
-    
+    backgroundColor: '#222',
+    color: '#fff',
+    textAlign: 'center',
+  },
+  title: {
+    fontSize: '24px',
+    marginBottom: '20px',
+  },
+  subTitle: {
+    fontSize: '18px',
+    marginBottom: '20px',
   },
   input: {
     flex: '1',
     padding: '8px',
-    marginRight: '8px',
+    margin: '0 8px',
     borderRadius: '4px',
     border: '1px solid #ddd',
+    backgroundColor: '#333',
+    color: '#fff',
   },
   button: {
     padding: '8px',
@@ -28,9 +48,19 @@ const styles = {
     color: '#fff',
     cursor: 'pointer',
   },
+  birdInfo: {
+    margin: '20px 0',
+  },
+  birdImage: {
+    borderRadius: '50%',
+    width: '200px',
+    height: '200px',
+    objectFit: 'cover',
+  },
 };
 
 const ChatApp = () => {
+  const [birdImageUrl, setBirdImageUrl] = useState("");
   const [messages, setMessages] = useState([]);
   const [prediction,setPrediction] = useState()
   const [question,setQuestion] = useState()
@@ -90,12 +120,35 @@ const ChatApp = () => {
       const birdClassificationResult = await birdClassificationResponse.json();
       const birdName = birdClassificationResult.name;
       setBird(birdName)
+      const searchTerm = birdName;
+      try {
+        const birdImageResponse = await fetch(`http://localhost:8000/get_bird_image/?search_term=${searchTerm}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            search_term: searchTerm,
+          }),
+        });
+        const birdImageResult = await birdImageResponse.json();
+        
+        console.log('birdImageResponse.bo')
+        console.log(birdImageResult.image_link) 
+
+        
+        if (birdImageResponse.status === 200) {
+          setBirdImageUrl(birdImageResult.image_link);
+        }
+      } catch (error) {
+        console.error('Error fetching bird image:', error);
+      }
     } catch (error) {
       console.error('Network error:', error);
     }
     }
 
-  const handleQuestionChange = (event) => {
+  const handleQuestionChange = (event) => { 
     setQuestion(event.target.value);
   };
 
@@ -155,17 +208,39 @@ console.log(messages)
     // setMessages((prevMessages) => [...prevMessages, newMessage]);
   },[messageAdded])
   return (
+    <div style={styles.body}>
     <div style={styles.container}>
-      <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Chatbot</h2>
-      <h4 style={{ textAlign: 'center', marginBottom: '20px' }}>Ask a question to start a chat!</h4>
-     {!startChat  && <> <input  style={styles.input} type="file" onChange={handleFileChange} />
-     {bird && <h6>Bird Name : {bird}</h6>}
-      <input style={styles.input} type="text" placeholder="Ask a question about the bird" value={question} onChange={handleQuestionChange} />
-      
-      <button style={styles.button} onClick={handleAskQuestion}>Ask Question</button></>
-      }
-    { startChat && <> <ChatWindow messages={messages} />
-      <MessageInput addMessage={addMessage} /></>}
+      <h2 style={styles.title}>ChirpChat</h2>
+      <h4 style={styles.subTitle}>Ask a question to start a chat!</h4>
+
+      {!startChat && (
+        <>
+          <input style={styles.input} type="file" onChange={handleFileChange} />
+          <input style={styles.input} type="text" placeholder="Ask a question about the bird" value={question} onChange={handleQuestionChange} />
+          <button style={styles.button} onClick={handleAskQuestion}>Ask Question</button>
+        </>
+      )}
+
+      {bird && (
+        <div style={styles.birdInfo}>
+          <h6>Bird Name: {bird}</h6>
+          {birdImageUrl && (
+            <img
+              src={birdImageUrl}
+              alt="Bird"
+              style={styles.birdImage}
+            />
+          )}
+        </div>
+      )}
+
+      {startChat && (
+        <>
+          <ChatWindow messages={messages} />
+          <MessageInput addMessage={addMessage} />
+        </>
+      )}
+    </div>
     </div>
   );
 };
