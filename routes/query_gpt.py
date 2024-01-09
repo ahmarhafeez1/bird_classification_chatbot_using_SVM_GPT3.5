@@ -12,6 +12,7 @@ async def query_gpt_route( query: str, bird: str, messages: List[dict[str,str]] 
     
     
     try:
+        print(messages)
         gpt_response = await query_gpt(bird=bird,query=query,messages=messages)
     
         return JSONResponse(
