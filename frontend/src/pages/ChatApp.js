@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ChatWindow from '../components/ChatWindow';
 import MessageInput from '../components/MessageInput';
-
-
+import { FaEarlybirds } from "react-icons/fa";
 import axios from 'axios'
 
 const styles = {
@@ -43,9 +42,9 @@ const styles = {
   button: {
     padding: '8px',
     borderRadius: '4px',
-    border: '1px solid #4caf50',
     background: '#4caf50',
     color: '#fff',
+    background:"#1DA1F2",
     cursor: 'pointer',
   },
   birdInfo: {
@@ -60,8 +59,8 @@ const styles = {
 };
 
 const ChatApp = () => {
-  const [birdImageUrl, setBirdImageUrl] = useState("");
   const [messages, setMessages] = useState([]);
+  const[show,setShow]=useState(false)
   const [prediction,setPrediction] = useState()
   const [question,setQuestion] = useState()
   const [messageAdded,setMessageAdded] = useState(false)
@@ -69,6 +68,7 @@ const ChatApp = () => {
   const [bird,setBird] = useState()
   const[startChat,setStartChat] = useState(false)
   const [file, setFile] = useState(null);
+  const [birdImageUrl, setBirdImageUrl] = useState("");
   const addMessage = (content, role="user") => {
     const newMessage = {  role:"user" ,content};
     setMessages((prevMessages) => [...prevMessages, newMessage]);
@@ -101,6 +101,29 @@ const ChatApp = () => {
   }
 
   
+  // const handleFileChange =async (event) => {
+  //   setFile(event.target.files[0]);
+  //   const formData = new FormData();
+  //   formData.append('file', event.target.files[0]);
+
+  //   try {
+  //     const birdClassificationResponse = await fetch('http://localhost:8000/bird_classification/', {
+  //       method: 'POST',
+  //       body: formData,
+  //     });
+
+  //     if (!birdClassificationResponse.ok) {
+  //       console.error('Error:', birdClassificationResponse.status, birdClassificationResponse.statusText);
+  //       return;
+  //     }
+
+  //     const birdClassificationResult = await birdClassificationResponse.json();
+  //     const birdName = birdClassificationResult.name;
+  //     setBird(birdName)
+  //   } catch (error) {
+  //     console.error('Network error:', error);
+  //   }
+  //   }
   const handleFileChange =async (event) => {
     setFile(event.target.files[0]);
     const formData = new FormData();
@@ -120,6 +143,7 @@ const ChatApp = () => {
       const birdClassificationResult = await birdClassificationResponse.json();
       const birdName = birdClassificationResult.name;
       setBird(birdName)
+      setShow(true)
       const searchTerm = birdName;
       try {
         const birdImageResponse = await fetch(`http://localhost:8000/get_bird_image/?search_term=${searchTerm}`, {
@@ -148,7 +172,7 @@ const ChatApp = () => {
     }
     }
 
-  const handleQuestionChange = (event) => { 
+  const handleQuestionChange = (event) => {
     setQuestion(event.target.value);
   };
 
@@ -208,41 +232,60 @@ console.log(messages)
     // setMessages((prevMessages) => [...prevMessages, newMessage]);
   },[messageAdded])
   return (
-    <div style={styles.body}>
-    <div style={styles.container}>
-      <h2 style={styles.title}>ChirpChat</h2>
-      <h4 style={styles.subTitle}>Ask a question to start a chat!</h4>
+  //   <div style={styles.container}>
+  //   <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Chatbot</h2>
+  //   <h4 style={{ textAlign: 'center', marginBottom: '20px' }}>Ask a question to start a chat!</h4>
+  //  {!startChat  && <> <input  style={styles.input} type="file" onChange={handleFileChange} />
+  //  {bird && <h6>Bird Name : {bird}</h6>}
+  //   <input style={styles.input} type="text" placeholder="Ask a question about the bird" value={question} onChange={handleQuestionChange} />
+    
+  //   <button style={styles.button} onClick={handleAskQuestion}>Ask Question</button></>
+  //   }
+  // { startChat && <> <ChatWindow messages={messages} />
+  //   <MessageInput addMessage={addMessage} /></>}
+  // </div>
+  <div style={styles.body}>
+  <div style={styles.container}>
+  <div style={{display:"flex"}}>
+  <div style={{alignContent:"center",display:"flex",alignItems:"center"}}><FaEarlybirds size="60" color='#1DA1F2'/></div>
+    <h2 style={styles.title}>ChirpChat</h2>
+    </div>
+    <h4 style={styles.subTitle}>Ask a question to start a chat!</h4>
 
-      {!startChat && (
-        <>
-          <input style={styles.input} type="file" onChange={handleFileChange} />
-          <input style={styles.input} type="text" placeholder="Ask a question about the bird" value={question} onChange={handleQuestionChange} />
-          <button style={styles.button} onClick={handleAskQuestion}>Ask Question</button>
-        </>
-      )}
-
-      {bird && (
-        <div style={styles.birdInfo}>
-          <h6>Bird Name: {bird}</h6>
-          {birdImageUrl && (
-            <img
-              src={birdImageUrl}
-              alt="Bird"
-              style={styles.birdImage}
-            />
-          )}
+    {!startChat && (
+      <>
+        <input style={styles.input} type="file" onChange={handleFileChange} accept="image/*"/>
+        {show && <div style={{marginTop:"1em"}}>
+          
+        <input style={styles.input}  type="text" placeholder="Ask a question about the bird" value={question} onChange={handleQuestionChange} />
+        <button style={styles.button} onClick={handleAskQuestion}>Ask Question</button>
         </div>
-      )}
+        }
+      </>
+    )}
 
-      {startChat && (
-        <>
-          <ChatWindow messages={messages} />
-          <MessageInput addMessage={addMessage} />
-        </>
-      )}
-    </div>
-    </div>
-  );
+    {bird && (
+      <div style={styles.birdInfo}>
+        <h6>Bird Name: {bird}</h6>
+        {birdImageUrl && (
+          <img
+            src={birdImageUrl}
+            alt="Bird"
+            style={styles.birdImage}
+          />
+        )}
+      </div>
+    )}
+
+    {startChat && (
+      <>
+        <ChatWindow messages={messages} />
+        <MessageInput addMessage={addMessage} />
+      </>
+    )}
+  </div>
+  </div>
+);
 };
 
 export default ChatApp;
